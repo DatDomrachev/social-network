@@ -1,0 +1,357 @@
+{
+    "info": {
+      "name": "Social Network Monolith API",
+      "description": "API для тестирования социальной сети",
+      "version": "1.0.0"
+    },
+    "variable": [
+      {
+        "key": "base_url",
+        "value": "http://localhost:8080",
+        "type": "string"
+      },
+      {
+        "key": "auth_token",
+        "value": "",
+        "type": "string"
+      },
+      {
+        "key": "user_id",
+        "value": "",
+        "type": "string"
+      },
+      {
+        "key": "friend_id",
+        "value": "",
+        "type": "string"
+      }
+    ],
+    "item": [
+      {
+        "name": "Health Check",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/health",
+            "host": ["{{base_url}}"],
+            "path": ["health"]
+          }
+        }
+      },
+      {
+        "name": "Auth",
+        "item": [
+          {
+            "name": "Register User",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "if (pm.response.code === 200) {",
+                    "    const response = pm.response.json();",
+                    "    pm.collectionVariables.set('user_id', response.user_id);",
+                    "}"
+                  ]
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"first_name\": \"Иван\",\n  \"second_name\": \"Иванов\",\n  \"birthdate\": \"1990-01-01\",\n  \"biography\": \"Разработчик софта\",\n  \"city\": \"Москва\",\n  \"password\": \"password123\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/user/register",
+                "host": ["{{base_url}}"],
+                "path": ["user", "register"]
+              }
+            }
+          },
+          {
+            "name": "Register Friend",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "if (pm.response.code === 200) {",
+                    "    const response = pm.response.json();",
+                    "    pm.collectionVariables.set('friend_id', response.user_id);",
+                    "}"
+                  ]
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"first_name\": \"Петр\",\n  \"second_name\": \"Петров\",\n  \"birthdate\": \"1988-05-15\",\n  \"biography\": \"Дизайнер интерфейсов\",\n  \"city\": \"Санкт-Петербург\",\n  \"password\": \"password456\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/user/register",
+                "host": ["{{base_url}}"],
+                "path": ["user", "register"]
+              }
+            }
+          },
+          {
+            "name": "Login",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "if (pm.response.code === 200) {",
+                    "    const response = pm.response.json();",
+                    "    pm.collectionVariables.set('auth_token', response.token);",
+                    "}"
+                  ]
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"id\": \"{{user_id}}\",\n  \"password\": \"password123\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/login",
+                "host": ["{{base_url}}"],
+                "path": ["login"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Users",
+        "item": [
+          {
+            "name": "Get User",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{base_url}}/user/get/{{user_id}}",
+                "host": ["{{base_url}}"],
+                "path": ["user", "get", "{{user_id}}"]
+              }
+            }
+          },
+          {
+            "name": "Search Users",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{base_url}}/user/search?first_name=Ив&last_name=Ив",
+                "host": ["{{base_url}}"],
+                "path": ["user", "search"],
+                "query": [
+                  {
+                    "key": "first_name",
+                    "value": "Ив"
+                  },
+                  {
+                    "key": "last_name",
+                    "value": "Ив"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Friends",
+        "item": [
+          {
+            "name": "Add Friend",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{auth_token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/friend/set/{{friend_id}}",
+                "host": ["{{base_url}}"],
+                "path": ["friend", "set", "{{friend_id}}"]
+              }
+            }
+          },
+          {
+            "name": "Delete Friend",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{auth_token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/friend/delete/{{friend_id}}",
+                "host": ["{{base_url}}"],
+                "path": ["friend", "delete", "{{friend_id}}"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Posts",
+        "item": [
+          {
+            "name": "Create Post",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{auth_token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"text\": \"Это мой первый пост в социальной сети!\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/post/create",
+                "host": ["{{base_url}}"],
+                "path": ["post", "create"]
+              }
+            }
+          },
+          {
+            "name": "Get Feed",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{auth_token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/post/feed?offset=0&limit=10",
+                "host": ["{{base_url}}"],
+                "path": ["post", "feed"],
+                "query": [
+                  {
+                    "key": "offset",
+                    "value": "0"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Dialogs - КЛЮЧЕВЫЕ ЭНДПОИНТЫ",
+        "item": [
+          {
+            "name": "Send Message",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{auth_token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"text\": \"Привет! Как дела?\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/dialog/{{friend_id}}/send",
+                "host": ["{{base_url}}"],
+                "path": ["dialog", "{{friend_id}}", "send"]
+              }
+            }
+          },
+          {
+            "name": "Send Another Message",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{auth_token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"text\": \"Хочу обсудить новый проект\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/dialog/{{friend_id}}/send",
+                "host": ["{{base_url}}"],
+                "path": ["dialog", "{{friend_id}}", "send"]
+              }
+            }
+          },
+          {
+            "name": "Get Dialog History",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{auth_token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/dialog/{{friend_id}}/list",
+                "host": ["{{base_url}}"],
+                "path": ["dialog", "{{friend_id}}", "list"]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }

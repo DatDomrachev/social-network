@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # Основной монолит (с проксированием диалогов)
+  monolith:
+    build:
+      context: ./monolith
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - DIALOG_SERVICE_URL=http://dialog-service:8081
+    depends_on:
+      - dialog-service
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Микросервис диалогов
+  dialog-service:
+    build:
+      context: ./dialog-service
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - PORT=8081
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+networks:
+  default:
+    name: social-network
